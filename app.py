@@ -1,29 +1,66 @@
 """Projeto.: Gerenciador de Tarefas."""
+import sqlite3
 
-tarefas = []
+# Desativando a lista global. Utilização de um Banco de Dados
+# tarefas = []
+
+"""Criação/Retorno a conexão com o banco de dados"""
+def conectar_bd():
+    conn = sqlite3.connect('tarefas.db')
+    return conn
+
+"""Criação da tabela 'tarefas' se ñ existir. """
+def inicializar_bd():
+    conn = conectar_bd()
+    cursor = conn.cursor()
+
+    # SQL → Criação da tabela
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS tarefas (
+            id INTEREGER PRIMARY KEY, 
+            descricao TEXT NOT NULL
+            )
+    """)
+    conn.commit()
+    conn.close()
+    print("Banco de dados inicializado com sucesso!")
 
 # Lógica da nova tarefa
 def adicionar_tarefa():
-    global tarefas # Variável global p/ armazenar resultados
     nova_tarefa = input("Digite a descrição da nova tarefa: ")
     
     # Verificação da Lógica
     if nova_tarefa.strip():
-        tarefas.append(nova_tarefa.strip())
+        conn = conectar_bd()
+        cursor = conn.cursor()
+
+        # SQL → INSERT INTO tabela (coluna) VALUES (placeholder)
+        cursor.execute("INSERT INTO tarefas (descricao) VALUES (?)", (nova_tarefa.strip(),))
+
+        conn.commit() # 'tarefas.db' → Alterações salvas
+        conn.close()
+
         print(f"\nTarefa '{nova_tarefa.strip()}' adicionada com sucesso!")
     else:
         print("\nPreencha a descrição da tarefa, por favor.")
 
 # Lógica de Listar Tarefas
 def listar_tarefas():
-    global tarefas # Variável global p/ armazenar resultados
-    print("\n--- Sua Tarefas ---")
+    conn = conectar_bd()
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT id, descricao FROM tarefas")
+    
+    tarefas_bd = cursor.fetchall()
 
-    if not tarefas:
-        print("Sem tarefas no momento...")
+    if not tarefas_bd:
+        print("\nNão há registro de tarefas")
     else:
-        for i, tarefas in enumerate(tarefas):
-            print(f"{i + 1}. {tarefas}")
+        print("\n--- Tarefas Registradas no Banco de Dados ---")
+        for id, descricao in tarefas_bd:
+            print(f"ID {id}: {descricao}")
+
+    conn.close()    
     
 # Exibir Menu Principal
 def exibir_menu():
@@ -51,6 +88,6 @@ def opcao_escolhida():
         else:
             print("Opção inválida. Por favor, escolha 1, 2 ou 3.")
 
-
 if __name__ == "__main__":
+    inicializar_bd() # <--- Nova função: Banco de Dados
     opcao_escolhida()
