@@ -2,7 +2,6 @@ tarefas = []
 
 # Menu Principal
 
-
 def exibir_menu():
     print("\n--- Gerenciador de Tarefas ---")
     print("1. Adicionar Tarefa")
@@ -10,9 +9,9 @@ def exibir_menu():
     print("3. Sair")
     return input("Escolha uma opção: ")
 
+# Lógica do Menu Principal
 
-def principal():
-    # Funcionamento do Menu Principal
+def opcao_escolhida():
     while True:
         opcao = exibir_menu()
 
@@ -30,6 +29,5 @@ def principal():
             print("Opção inválida. Por favor, escolha 1, 2 ou 3.")
 
 
-# Ponto de entrada do programa: garante que 'principal()' rode ao executar o arquivo.
 if __name__ == "__main__":
-    principal()
+    opcao_escolhida()
