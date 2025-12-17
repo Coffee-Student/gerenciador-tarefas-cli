@@ -17,17 +17,17 @@ def inicializar_bd():
     # SQL → Criação da tabela
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS tarefas (
-            id INTEREGER PRIMARY KEY, 
+            id INTEGER PRIMARY KEY, 
             descricao TEXT NOT NULL
             )
     """)
     conn.commit()
     conn.close()
-    print("Banco de dados inicializado com sucesso!")
+    print("\nBanco de dados inicializado com sucesso!")
 
 # Lógica da nova tarefa
 def adicionar_tarefa():
-    nova_tarefa = input("Digite a descrição da nova tarefa: ")
+    nova_tarefa = input("\nDigite a descrição da nova tarefa: ")
     
     # Verificação da Lógica
     if nova_tarefa.strip():
@@ -54,21 +54,48 @@ def listar_tarefas():
     tarefas_bd = cursor.fetchall()
 
     if not tarefas_bd:
-        print("\nNão há registro de tarefas")
+        print("\nNão há registro de tarefas...\n")
     else:
-        print("\n--- Tarefas Registradas no Banco de Dados ---")
+        print("\n--- Tarefas Registradas no Banco de Dados ---\n")
         for id, descricao in tarefas_bd:
             print(f"ID {id}: {descricao}")
 
-    conn.close()    
-    
+    conn.close()
+
+# Lógica de Remover Tarefas
+def remover_tarefa():
+    listar_tarefas() # Visualização das tarefas
+
+    # Rotina de Indentificação de Erros
+    try:
+        id_remover = int(input("\nDigita ID da tarefa que deseja remover: "))
+
+        conn = conectar_bd()
+        cursor = conn.cursor()
+
+        cursor.execute("DELETE FROM tarefas WHERE id = ?", (id_remover,))
+
+        if cursor.rowcount > 0: # Confirmação da exclusão.
+            conn.commit()
+            print("\nTarefa removida com sucesso!")
+        else:
+            print("\nOcorreu um erro. Tente novamente.")
+
+        conn.close()
+
+    except ValueError:
+        print("\n Entrada inválida. Por favor, verifique o ID digitado.")
+
+
 # Exibir Menu Principal
 def exibir_menu():
-    print("\n--- Gerenciador de Tarefas ---")
+    print("\n ▒▒▒ Gerenciador de Tarefas ▒▒▒\n")
     print("1. Adicionar Tarefa")
     print("2. Listar Tarefas")
-    print("3. Sair")
-    return input("Escolha uma opção: ")
+    print("3. Remover Tarefa")
+    print("4. Atualizar Tarefa")
+    print("5. Sair")
+    return input("\nEscolha uma opção: ")
 
 # Lógica do Menu Principal
 def opcao_escolhida():
@@ -82,7 +109,9 @@ def opcao_escolhida():
             listar_tarefas()
 
         elif opcao == '3':
-            print("Saindo do gerenciador de tarefas...!")
+            remover_tarefa()
+        
+        elif opcao == '4':
             break
 
         else:
